@@ -1,71 +1,129 @@
+// ------- Heap class [insertion, deletion, Heapsort] -------
+// complexity of insertion single element : O(logn)
+// complexity of insertion of n elements in heap : O(nlogn)
 #include <iostream>
-#include <vector>
+#include <cmath>
 
-using namespace std;
- 
-void Insert(vector<int>& vec, int key){
-    // Insert key at the end
-    auto i = vec.size();
-    vec.emplace_back(key);
- 
-    // Rearrange elements: O(log n)
-    while (i > 0 && key > vec[i % 2 == 0 ? (i/2)-1 : i/2]){
-        vec[i] = vec[i % 2 == 0 ? (i/2)-1 : i/2];
-        i = i % 2 == 0 ? (i/2)-1 : i/2;
+using namespace std ;
+
+class Heap {
+    private :
+      int *Arr ;
+      int length ; // Total capacity 
+      int size ;   // current length after deletions == capacity - size can be used to store deleted elements for heap sort
+    public :
+      Heap() {
+          length = 0 ;
+      }
+      //---- Working Functions ----
+      void getElements() ;
+      void form_Max_Heap() ;
+      void form_Min_Heap() ;
+      void insert_MaxHeap(int index) ;
+      void insert_MinHeap(int index) ;
+      void delete_Maxheap() ;
+      void delete_Minheap() ;
+      void display() ;
+      void Heapsort_Max() ;
+      
+      ~Heap() {
+          delete []Arr ;
+      }
+};
+
+void Heap::getElements() {
+    cout<<"Enter no of elements "<<endl ; 
+    cin>>length ;
+    this -> size = length ;
+    Arr = new int[length+1] ; // to accomodate index from 1 to length
+    for(int i = 1 ; i <= length ; i++) {
+        cout<<"Enter data "<<i<<" : ";
+        cin>>Arr[i];
     }
-    vec[i] = key;
+    cout<<"---- Elements Inserted ----\n\n"<<endl;
 }
- 
-void InsertInplace(int A[], int n){
-    int i = n;
-    int temp = A[n];
-    while (i > 0 && temp > A[i % 2 == 0 ? (i/2)-1 : i/2]){
-        A[i] = A[i % 2 == 0 ? (i/2)-1 : i/2];
-        i = i % 2 == 0 ? (i/2)-1 : i/2;
-    }
-    A[i] = temp;
-}
- 
-void CreateHeap(vector<int>& vec, int A[], int n){
-    // O(n log n)
-    for (int i=0; i<n; i++){
-        Insert(vec, A[i]);
+
+void Heap::form_Max_Heap() {
+    for(int i = 2 ; i <= length ; i++) {
+        insert_MaxHeap(i) ;
     }
 }
- 
-void createHeap(int A[], int n){
-    for (int i=0; i<n; i++){
-        InsertInplace(A, i);
+
+void Heap::insert_MaxHeap(int index) {
+    int temp , i = index ;
+    temp = Arr[i] ;
+    while (i>1 && temp>Arr[i/2]) {
+        Arr[i] = Arr[i/2] ;
+        i /= 2 ;
+    }
+    Arr[i] = temp ;
+}
+
+void Heap::form_Min_Heap() {
+    for(int i = 2 ; i <= length ; i++) {
+        insert_MinHeap(i) ;
     }
 }
- 
-template <class T>
-void Print(T& vec, int n, char c){
-    cout << c << ": [" << flush;
-    for (int i=0; i<n; i++){
-        cout << vec[i] << flush;
-        if (i < n-1){
-            cout << ", " << flush;
+
+void Heap::insert_MinHeap(int index) {
+    int temp , i = index ;
+    temp = Arr[i] ;
+    while (i>1 && temp<Arr[i/2]) {
+        Arr[i] = Arr[i/2] ;
+        i /= 2 ;
+    }
+    Arr[i] = temp ;
+}
+
+void Heap::delete_Maxheap() {
+    int x , i , j ;
+    x = Arr[1] ;
+    Arr[1] = Arr[size] ;
+    Arr[size] = x ;
+    i = 1 ;
+    j = 2*i ;
+    while ( j <= size - 1 ) {
+        if (j < size - 1 && Arr[j+1] > Arr[j]) {
+            j += 1 ;
+        }
+        if (Arr[i] < Arr[j]) {
+            int var = Arr[i] ;
+            Arr[i]  = Arr[j] ;
+            Arr[j]  = var ;
+            i = j ;
+            j = 2*j ;
+        }
+        else {
+            break ;
         }
     }
-    cout << "]" << endl;
+    size -- ;
+} 
+
+void Heap::Heapsort_Max() {
+    for(int i = 1 ; i <= length ; i++) {
+        delete_Maxheap() ;
+    }
+    cout<<"Heapsort_Max : ";
+    for(int i = 1 ; i <= length ; i++) {
+        cout<<Arr[i]<<"  ";
+    }cout<<endl ;
 }
- 
- 
-int main() {
- 
-    cout << "Create Heap" << endl;
-    int b[] = {10, 20, 30, 25, 5, 40, 35};
-    Print(b, sizeof(b)/sizeof(b[0]), 'b');
- 
-    vector<int> v;
-    CreateHeap(v, b, sizeof(b)/sizeof(b[0]));
-    Print(v, v.size(), 'v');
- 
-    cout << "Inplace Insert" << endl;
-    createHeap(b, sizeof(b)/sizeof(b[0]));
-    Print(b, sizeof(b)/sizeof(b[0]), 'b');
- 
- 
-    return 0;
+
+void Heap::display() {
+    for(int i = 1 ; i <= size ; i++) {
+        cout<<Arr[i]<<"   ";
+    }cout<<endl;
 }
+
+int main(void) {
+    Heap H ;
+    H.getElements() ;
+    cout<<"Inserted elements : ";H.display() ;
+    H.form_Max_Heap() ;
+    cout<<"Max Heap : ";H.display() ;
+    H.Heapsort_Max() ;
+    
+    return 0 ;
+}
+
